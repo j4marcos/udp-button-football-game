@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futebol de Botão - Multiplayer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .game-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .game-canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #gameCanvas {
+            border: 3px solid #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            background: #228B22;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .score-board {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .team-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .team1 { color: #4FC3F7; }
+        .team2 { color: #FF7043; }
+
+        .players-list {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .network-stats {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 12px;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .connect-button {
+            width: 100%;
+            background: #4CAF50;
+            border: none;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .connect-button:hover {
+            background: #45a049;
+        }
+
+        .connect-button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .disconnect-button {
+            background: #f44336;
+        }
+
+        .disconnect-button:hover {
+            background: #da190b;
+        }
+
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .status.connected {
+            background: rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+        }
+
+        .status.disconnected {
+            background: rgba(244, 67, 54, 0.3);
+            color: #f44336;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #cccccc;
+        }
+
+        .field-line {
+            stroke: white;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .goal {
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-canvas-container">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+        </div>
+        
+        <div class="sidebar">
+            <div class="score-board">
+                <h3>Placar</h3>
+                <div class="team-score">
+                    <span class="team1">Time Azul</span>
+                    <span id="team1Score">0</span>
+                </div>
+                <div class="team-score">
+                    <span class="team2">Time Vermelho</span>
+                    <span id="team2Score">0</span>
+                </div>
+                <div>Tempo: <span id="gameTime">00:00</span></div>
+            </div>
+
+            <div class="players-list">
+                <h3>Jogadores Online</h3>
+                <div id="playersList">
+                    <div class="player-item">
+                        <span>Aguardando conexão...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="network-stats">
+                <h3>Estatísticas de Rede</h3>
+                <div class="stat-item">
+                    <span>Latência:</span>
+                    <span id="latency">-- ms</span>
+                </div>
+                <div class="stat-item">
+                    <span>Jitter:</span>
+                    <span id="jitter">-- ms</span>
+                </div>
+                <div class="stat-item">
+                    <span>Perda de Pacotes:</span>
+                    <span id="packetLoss">-- %</span>
+                </div>
+                <div class="stat-item">
+                    <span>FPS:</span>
+                    <span id="fps">60</span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div id="connectionStatus" class="status disconnected">
+                    Desconectado
+                </div>
+                
+                <button id="connectBtn" class="connect-button">
+                    Conectar ao Jogo
+                </button>
+                
+                <div class="instructions">
+                    <h4>Controles:</h4>
+                    <p>• Use as teclas WASD ou setas para mover</p>
+                    <p>• Clique na tela para focar o jogo</p>
+                    <p>• ESC para sair do foco</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game-client.js"></script>
+</body>
+</html>
