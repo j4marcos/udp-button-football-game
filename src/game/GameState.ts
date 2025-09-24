@@ -8,6 +8,7 @@ export interface Player {
     id: string;
     position: Vector2D;
     velocity: Vector2D;
+    direction?: number;
     team: 'team1' | 'team2';
     size: number;
     maxSpeed: number;
@@ -202,6 +203,33 @@ export class GameState {
     resetBall(): void {
         this.ball.position = { x: this.field.width / 2, y: this.field.height / 2 };
         this.ball.velocity = { x: 0, y: 0 };
+    }
+
+    updatePlayerDirection(playerId: string, direction: number): void {
+        const player = this.players.get(playerId);
+        if (player) {
+            player.direction = direction;
+        }
+    }
+
+    handlePlayerKick(playerId: string): void {
+        const player = this.players.get(playerId);
+        if (!player) return;
+
+        // Verificar se a bola está próxima o suficiente para chutar
+        const dx = player.position.x - this.ball.position.x;
+        const dy = player.position.y - this.ball.position.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < player.size + this.ball.size + 20) { // Alcance do chute
+            // Aplicar força de chute na direção do jogador
+            const kickForce = 400;
+            const directionX = player.direction !== undefined ? Math.cos(player.direction) : -dx / distance;
+            const directionY = player.direction !== undefined ? Math.sin(player.direction) : -dy / distance;
+
+            this.ball.velocity.x = directionX * kickForce;
+            this.ball.velocity.y = directionY * kickForce;
+        }
     }
 
     getGameState() {

@@ -35,15 +35,37 @@ export class GameManager {
     }
 
     private handlePlayerMove(data: PlayerMoveEvent): void {
+        const player = this.gameState.players.get(data.playerId);
+        if (!player) return;
+
+        // Se não há posição no evento, use a posição atual do jogador
+        const currentPosition = data.position.x === 0 && data.position.y === 0 
+            ? player.position 
+            : data.position;
+
         // Aplicar interpolação/extrapolação para compensar latência
-        const interpolatedPosition = this.interpolatePosition(data);
+        const interpolatedPosition = this.interpolatePosition({
+            ...data,
+            position: currentPosition
+        });
         const smoothedVelocity = this.smoothVelocity(data.velocity);
         
+        // Atualizar dados do jogador
         this.gameState.updatePlayerPosition(
             data.playerId, 
             interpolatedPosition, 
             smoothedVelocity
         );
+
+        // Atualizar direção se fornecida
+        if (data.direction !== undefined) {
+            this.gameState.updatePlayerDirection(data.playerId, data.direction);
+        }
+
+        // Processar chute se solicitado
+        if (data.kick) {
+            this.gameState.handlePlayerKick(data.playerId);
+        }
     }
 
     private interpolatePosition(data: PlayerMoveEvent): { x: number; y: number } {
@@ -82,8 +104,8 @@ export class GameManager {
         if (player) {
             console.log(`Jogador ${playerId} adicionado ao ${team}`);
             
-            // Verificar se o jogo pode começar
-            if (this.gameState.players.size >= 2 && !this.gameState.isGameActive) {
+            // Verificar se o jogo pode começar (modificado para funcionar com 1 jogador durante testes)
+            if (this.gameState.players.size >= 1 && !this.gameState.isGameActive) {
                 this.startGame();
             }
         } else {

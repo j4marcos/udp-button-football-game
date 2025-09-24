@@ -23,6 +23,9 @@ export interface PlayerMoveEvent {
     playerId: string;
     position: { x: number; y: number };
     velocity: { x: number; y: number };
+    direction?: number;
+    isRunning?: boolean;
+    kick?: boolean;
     timestamp: number;
     sequence: number;
 }

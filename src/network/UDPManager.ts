@@ -174,11 +174,16 @@ export class UDPManager {
     }
 
     private handlePlayerInput(session: ClientSession, packet: UDPPacket): void {
-        if (packet.data && packet.data.position && packet.data.velocity) {
+        if (packet.data && packet.data.velocity) {
+            // Se não há posição no pacote, use a posição atual do jogador no GameManager
+            // ou calcule baseado na velocidade e timestamp
             this.eventEmitter.emit(GameEventType.PLAYER_MOVE, {
                 playerId: session.id,
-                position: packet.data.position,
+                position: packet.data.position || { x: 0, y: 0 }, // Será atualizado pelo GameManager
                 velocity: packet.data.velocity,
+                direction: packet.data.direction,
+                isRunning: packet.data.isRunning,
+                kick: packet.data.kick,
                 timestamp: packet.timestamp,
                 sequence: packet.sequence
             } as PlayerMoveEvent);
