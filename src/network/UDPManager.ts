@@ -165,6 +165,9 @@ export class UDPManager {
             case 'ping':
                 this.handlePing(session, packet);
                 break;
+            case 'pong':
+                this.handlePong(session, packet);
+                break;
             case 'join_game':
                 this.handleJoinGame(session, packet);
                 break;
@@ -198,6 +201,17 @@ export class UDPManager {
             timestamp: Date.now(),
             data: { originalTimestamp: packet.timestamp }
         });
+    }
+
+    private handlePong(session: ClientSession, packet: UDPPacket): void {
+        // O pong é uma resposta ao ping que enviamos
+        // A latência já foi calculada em updateSessionMetrics
+        // Aqui podemos apenas logar se necessário para debug
+        if (packet.data && packet.data.originalTimestamp) {
+            const latency = Date.now() - packet.data.originalTimestamp;
+            // Log opcional para debug
+            // console.log(`📡 Pong recebido de ${session.id}, latência: ${latency}ms`);
+        }
     }
 
     private handleJoinGame(session: ClientSession, packet: UDPPacket): void {

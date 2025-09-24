@@ -161,37 +161,6 @@
             background: #666;
             cursor: not-allowed;
         }
-
-        .controls-panel {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .control-item {
-            margin: 8px 0;
-            font-size: 14px;
-        }
-
-        .players-panel {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .player-item {
-            margin: 8px 0;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .player-me {
-            border: 2px solid #FFD700;
-            background: rgba(255, 215, 0, 0.2);
-        }
     </style>
 </head>
 <body>
@@ -234,29 +203,13 @@
                 <button id="connectBtn" class="button-connect">Conectar</button>
             </div>
 
-            <div class="status-panel">
-                <h3>📡 REDE</h3>
-                <div class="status-item">
-                    <span>Latência:</span>
-                    <span id="latencyInfo">-</span>
-                </div>
-                <div class="status-item">
-                    <span>Jitter:</span>
-                    <span id="jitterInfo">-</span>
-                </div>
-                <div class="status-item">
-                    <span>Perda:</span>
-                    <span id="packetLossInfo">-</span>
-                </div>
-            </div>
-
-            <!-- <div class="controls-panel">
+            <div class="controls-panel">
                 <h3>🎮 CONTROLES</h3>
                 <div class="control-item">🖱️ <strong>Mouse:</strong> Direcionar jogador</div>
                 <div class="control-item">⌨️ <strong>Shift:</strong> Correr</div>
                 <div class="control-item">🖱️ <strong>Clique:</strong> Chutar</div>
                 <div class="control-item">📱 <strong>Touch:</strong> Toque na tela</div>
-            </div> -->
+            </div>
 
             <div class="players-panel">
                 <h3>👥 JOGADORES</h3>

@@ -84,7 +84,7 @@ class BrowserGameClient {
     setupControls() {
         console.log('🎮 Configurando controles...');
         
-        // Controle do mouse para direção
+        // Controle do mouse para direção - jogador sempre se move na direção do mouse
         this.canvas.addEventListener('mousemove', (e) => {
             const rect = this.canvas.getBoundingClientRect();
             this.mousePosition.x = e.clientX - rect.left;
@@ -96,15 +96,21 @@ class BrowserGameClient {
                 if (player) {
                     const dx = this.mousePosition.x - player.position.x;
                     const dy = this.mousePosition.y - player.position.y;
-                    this.playerDirection = Math.atan2(dy, dx);
+                    
+                    // Só atualiza direção se o mouse estiver longe o suficiente do jogador
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance > 10) { // Zona morta de 10 pixels
+                        this.playerDirection = Math.atan2(dy, dx);
+                        this.sendInput(); // Envia input automaticamente quando muda direção
+                    }
                 }
             }
         });
         
-        // Click do mouse para correr
+        // Click do mouse para correr (velocidade extra)
         this.canvas.addEventListener('mousedown', (e) => {
             if (e.button === 0) { // Botão esquerdo
-                console.log('🏃 Começou a correr');
+                console.log('🏃 Correndo (velocidade extra)');
                 this.isRunning = true;
                 this.sendInput();
             }
@@ -112,7 +118,7 @@ class BrowserGameClient {
         
         this.canvas.addEventListener('mouseup', (e) => {
             if (e.button === 0) { // Botão esquerdo
-                console.log('🚶 Parou de correr');
+                console.log('🚶 Andando (velocidade normal)');
                 this.isRunning = false;
                 this.sendInput();
             }
@@ -187,12 +193,11 @@ class BrowserGameClient {
         };
         gameLoop();
         
-        // Enviar input continuamente quando necessário
+        // Enviar input continuamente para movimento suave
         setInterval(() => {
-            if (this.isRunning) {
-                this.sendInput();
-            }
-        }, 1000 / 20); // 20 FPS
+            // Sempre envia input para manter movimento contínuo
+            this.sendInput();
+        }, 1000 / 30); // 30 FPS para input suave
     }
 
     render() {
