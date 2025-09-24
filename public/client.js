@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const dgram = require("dgram");
-class UDPGameClient {
+class GameClient {
     constructor() {
         this.PORT = 33333;
         this.HOST = '127.0.0.1';
@@ -141,7 +141,7 @@ class UDPGameClient {
         console.log('👋 Cliente desconectado');
     }
 }
-const client = new UDPGameClient();
+const client = new GameClient();
 client.connect();
 process.on('SIGINT', () => {
     console.log('\n🛑 Desconectando...');
